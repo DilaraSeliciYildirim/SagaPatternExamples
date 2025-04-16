@@ -1,0 +1,1 @@
+- Her API projesine MassTransit .net core kuruyoruz.
