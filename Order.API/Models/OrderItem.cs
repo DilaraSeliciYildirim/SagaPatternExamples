@@ -6,7 +6,6 @@ namespace Order.API.Models
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
-        public int MyProperty { get; set; }
 
         [Column(TypeName ="decimal(18,2)")] // toplam 16 basamak virgülden önce 2 basamak sonra
         public decimal Price { get; set; }
