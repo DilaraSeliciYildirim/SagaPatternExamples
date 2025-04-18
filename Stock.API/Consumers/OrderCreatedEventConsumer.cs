@@ -47,19 +47,21 @@ namespace Stock.API.Consumers
 
                         _logger.LogInformation($"Stock was reserved for Buyer Id : {context.Message.BuyerId}");
 
-                        var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri($"queue:{RabbitMQSettings.StockReservedEventQueueName}"));
-
-                        var stockReservedEvent = new StockReservedEvent
-                        {
-                            Payment = context.Message.PaymentMessage,
-                            BuyerId = context.Message.BuyerId,
-                            OrderId = context.Message.OrderId,
-                            OrderItems = context.Message.OrderItems
-                        };
-
-                       await sendEndpoint.Send(stockReservedEvent);
+                        
                     }
                 }
+
+                var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri($"queue:{RabbitMQSettings.StockReservedEventQueueName}"));
+
+                var stockReservedEvent = new StockReservedEvent
+                {
+                    Payment = context.Message.PaymentMessage,
+                    BuyerId = context.Message.BuyerId,
+                    OrderId = context.Message.OrderId,
+                    OrderItems = context.Message.OrderItems
+                };
+
+                await sendEndpoint.Send(stockReservedEvent);
             }
             else
             {
