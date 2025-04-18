@@ -1,5 +1,7 @@
+﻿using Core;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Order.API.Consumers;
 using Order.API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,9 +15,15 @@ builder.Services.AddControllers();
 
 builder.Services.AddMassTransit(x => {
 
+    x.AddConsumer<PaymentSuccededEventConsumer>();
     x.UsingRabbitMq((context, cfg) => {
 
         cfg.Host(builder.Configuration.GetConnectionString("RabbitMQ"));
+        // bence burda queue tanımlamaya gerek yok. Çünkü Payment'dan event publish edildi. Özellikle bi queue'ya atılmadı.7
+        cfg.ReceiveEndpoint(e => { // evet queue tanımlamadım sadece aşağıdaki ayarla çalıştı
+
+            e.ConfigureConsumer<PaymentSuccededEventConsumer>(context);
+        });
     });
    
 });
