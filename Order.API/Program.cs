@@ -16,6 +16,7 @@ builder.Services.AddControllers();
 builder.Services.AddMassTransit(x => {
 
     x.AddConsumer<PaymentSuccededEventConsumer>();
+    x.AddConsumer<PaymentFailedEventConsumer>();
     x.UsingRabbitMq((context, cfg) => {
 
         cfg.Host(builder.Configuration.GetConnectionString("RabbitMQ"));
@@ -23,6 +24,11 @@ builder.Services.AddMassTransit(x => {
         cfg.ReceiveEndpoint(e => { // evet queue tanımlamadım sadece aşağıdaki ayarla çalıştı
 
             e.ConfigureConsumer<PaymentSuccededEventConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint(e => { 
+
+            e.ConfigureConsumer<PaymentFailedEventConsumer>(context);
         });
     });
    
