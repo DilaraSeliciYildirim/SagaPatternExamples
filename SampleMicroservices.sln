@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "O.Payment.API", "O.Payment.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "O.Core", "O.Core\O.Core.csproj", "{740F6ADC-661B-424E-9AE8-36F7CA34C1C7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SagaStateMachine", "SagaStateMachine\SagaStateMachine.csproj", "{8E0B5B96-5F70-49B0-A85A-89603A48C6A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,10 @@ Global
 		{740F6ADC-661B-424E-9AE8-36F7CA34C1C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{740F6ADC-661B-424E-9AE8-36F7CA34C1C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{740F6ADC-661B-424E-9AE8-36F7CA34C1C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E0B5B96-5F70-49B0-A85A-89603A48C6A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E0B5B96-5F70-49B0-A85A-89603A48C6A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E0B5B96-5F70-49B0-A85A-89603A48C6A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E0B5B96-5F70-49B0-A85A-89603A48C6A3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,6 +79,7 @@ Global
 		{3E7439D3-EE38-45E9-9623-2DEF3919F245} = {0EF352CE-5BD9-40A9-A2E5-9E9BD1AA321D}
 		{A8CDF7C3-1AC5-4601-BC22-DAEEBE2A3705} = {0EF352CE-5BD9-40A9-A2E5-9E9BD1AA321D}
 		{740F6ADC-661B-424E-9AE8-36F7CA34C1C7} = {0EF352CE-5BD9-40A9-A2E5-9E9BD1AA321D}
+		{8E0B5B96-5F70-49B0-A85A-89603A48C6A3} = {0EF352CE-5BD9-40A9-A2E5-9E9BD1AA321D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B33C9D89-5AB0-4656-96E3-75F66A7A475A}
