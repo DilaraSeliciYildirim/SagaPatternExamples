@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace O.Core.Interfaces
 {
-    public interface IOrderCreatedRequestEvent // order olustuktan sonra StateMachine'e gidecek event
+    // Bu coralatedBy'dan miras almıyor çünkü zaten state machine'de fırlatılmıyo
+    public interface IOrderCreatedRequestEvent // order OrderApi'de olustuktan sonra StateMachine'e gidecek event
     {
         public int OrderId { get; set; }
         public string BuyerId { get; set; }

@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using O.Core.Events;
 using O.Core.Interfaces;
 using SagaStateMachine.Models;
 
@@ -6,7 +7,7 @@ namespace SagaStateMachine
 {
     public class OrderStateMachine : MassTransitStateMachine<OrderStateInstance>
     {
-        public Event<IOrderCreatedRequestEvent> OrderCreatedRequestEvent { get; set; }
+        public Event<IOrderCreatedRequestEvent> OrderCreatedRequestEvent { get; set; } // SagaStateMachine'i tetikliyecek event.
         public State OrderCreated { get; private set; }
         public OrderStateMachine()
         {
@@ -38,6 +39,7 @@ namespace SagaStateMachine
 
                })
                .Then(context => { Console.WriteLine($"Before OrderCreatedRequestEvent: {context.Saga}"); })
+               .Publish(context => new OrderCreatedEvent(context.Saga.CorrelationId) { OrderItems = context.Message.OrderItems })
                .TransitionTo(OrderCreated)
                .Then(context => { Console.WriteLine($"After OrderCreatedRequestEvent: {context.Saga}"); }));
         }

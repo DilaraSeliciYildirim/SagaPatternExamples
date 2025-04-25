@@ -25,10 +25,10 @@ namespace SagaStateMachine.Models
 
             foreach (var item in props.ToList())
             {
-                sb.Append($"{item.Name}:{item.GetValue(this, null)}");
+                sb.AppendLine($"{item.Name}:{item.GetValue(this, null)}");
             }
 
-            sb.Append("-----");
+            sb.AppendLine("-----");
 
             return sb.ToString();
         }
