@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using O.Core;
 using O.Core.Events;
 using O.Core.Interfaces;
 using SagaStateMachine.Models;
@@ -8,7 +9,9 @@ namespace SagaStateMachine
     public class OrderStateMachine : MassTransitStateMachine<OrderStateInstance>
     {
         public Event<IOrderCreatedRequestEvent> OrderCreatedRequestEvent { get; set; } // SagaStateMachine'i tetikliyecek event.
+        public Event<IStockReservedEvent> StockReservedEvent { get; set; } // Stock'tan gelicek event, Saga dinleyecek..
         public State OrderCreated { get; private set; }
+        public State StockReserved { get; private set; }
         public OrderStateMachine()
         {
             InstanceState(x => x.CurrentState);
@@ -42,6 +45,23 @@ namespace SagaStateMachine
                .Publish(context => new OrderCreatedEvent(context.Saga.CorrelationId) { OrderItems = context.Message.OrderItems })
                .TransitionTo(OrderCreated)
                .Then(context => { Console.WriteLine($"After OrderCreatedRequestEvent: {context.Saga}"); }));
+
+            During(OrderCreated, 
+                When(StockReservedEvent)
+                .TransitionTo(StockReserved)
+                .Send(new Uri($"queue:{RabbitMQSettings.StockReservedRequestPaymentQueueName}"), context => 
+                new StockReservedRequestPaymentEvent(context.Saga.CorrelationId)
+                { OrderItems = context.Message.OrderItems, // burdaki message When kısmındaki event'den gelen message.
+                  Payment = new PaymentMessage()
+                  {
+                      CardName = context.Saga.CardName,
+                      CardNumber = context.Saga.CardNumber,
+                      CVV = context.Saga.CVV,
+                      Expiration = context.Saga.Expiration,
+                      TotalPrice = context.Saga.TotalPrice,
+                  }
+                })
+                .Then(context => { Console.WriteLine($"After StockReservedEvent: {context.Saga}"); }));
         }
     }
 }

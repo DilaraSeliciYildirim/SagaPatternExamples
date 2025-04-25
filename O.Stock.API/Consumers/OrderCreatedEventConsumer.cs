@@ -8,7 +8,7 @@ using O.Stock.API.Models;
 
 namespace O.Stock.API.Consumers
 {
-    public class OrderCreatedEventConsumer : IConsumer<IOrderCreatedEvent>
+    public class OrderCreatedEventConsumer : IConsumer<IOrderCreatedEvent> // Saga OrderCreatedEvent'i publish eder
     {
         private readonly AppDbContext _appDbContext;
         private ILogger<OrderCreatedEventConsumer> _logger;
