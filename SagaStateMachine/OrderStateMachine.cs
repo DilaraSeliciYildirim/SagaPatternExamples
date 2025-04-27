@@ -9,18 +9,26 @@ namespace SagaStateMachine
     public class OrderStateMachine : MassTransitStateMachine<OrderStateInstance>
     {
         public Event<IOrderCreatedRequestEvent> OrderCreatedRequestEvent { get; set; } // SagaStateMachine'i tetikliyecek event.
-        public Event<IStockReservedEvent> StockReservedEvent { get; set; } // Stock'tan gelicek event, Saga dinleyecek..
+        public Event<IStockReservedEvent> StockReservedEvent { get; set; } // StockAPI'den gelicek event, Saga dinleyecek..
+        public Event<IPaymentCompletedEvent> PaymentCompletedEvent { get; set; } // PaymentAPI'den gelicek event, Saga dinleyecek..
+        public Event<IStockNotReservedEvent> StockNotReservedEvent { get; set; } 
         public State OrderCreated { get; private set; }
         public State StockReserved { get; private set; }
+        public State StockNotReserved { get; private set; }
+        public State PaymentCompleted { get; private set; }
         public OrderStateMachine()
         {
             InstanceState(x => x.CurrentState);
 
+            // OrderCreatedREquest event'i geldiğinde, State'teki (x) OrderId ile Event'den gelen (z) OrderId'yi karşılaştır
+            // eğer uyuşmazlarsa demek ki yeni bir Order, o zaman Guid id ile yeni bi satır oluştur
+
             Event(() => OrderCreatedRequestEvent, y => y.CorrelateBy<int>(x => x.OrderId, z => z.Message.OrderId)
             .SelectId(context => Guid.NewGuid()));
 
-            // OrderCreatedREquest event'i geldiğinde, State'teki (x) OrderId ile Event'den gelen (z) OrderId'yi karşılaştır
-            // eğer uyuşmazlarsa demek ki yeni bir Order, o zaman Guid id ile yeni bi satır oluştur
+            Event(() => StockReservedEvent, x => x.CorrelateById(y => y.Message.CorrelationId));
+            Event(() => StockNotReservedEvent, x => x.CorrelateById(y => y.Message.CorrelationId));
+            Event(() => PaymentCompletedEvent, x => x.CorrelateById(y => y.Message.CorrelationId));
 
 
             // State initial iken, OrderCreatedRequestEvent geldiğinde, event'den gelen datayı (message) DB'deki dataya (Saga)
@@ -61,7 +69,19 @@ namespace SagaStateMachine
                       TotalPrice = context.Saga.TotalPrice,
                   }
                 })
-                .Then(context => { Console.WriteLine($"After StockReservedEvent: {context.Saga}"); }));
+                .Then(context => { Console.WriteLine($"After StockReservedEvent: {context.Saga}"); }),
+                
+                When(StockNotReservedEvent)
+                .TransitionTo(StockNotReserved)
+                .Publish(context => new OrderRequestFailedEvent() 
+                { OrderId = context.Saga.OrderId, Reason = context.Message.Reason }));
+
+            During(StockReserved,
+                When(PaymentCompletedEvent)
+                .TransitionTo(PaymentCompleted)
+                .Publish(context => new OrderRequestCompletedEvent() { OrderId = context.Saga.OrderId })
+                .Then(context => { Console.WriteLine($"After PaymentCompletedEvent: {context.Saga}"); })
+                .Finalize()); // Bu adım önemli, artık işlem bitti state "final" olacak
         }
     }
 }

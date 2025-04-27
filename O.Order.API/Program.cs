@@ -1,5 +1,8 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using O.Core;
+using O.Core.Events;
+using O.Order.API.Consumers;
 using O.Order.API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,10 +17,17 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddMassTransit(x => {
 
+    x.AddConsumer<OrderRequestCompletedEventConsumer>();
+    x.AddConsumer<OrderRequestFailedEventConsumer>();
     x.UsingRabbitMq((context, cfg) => {
 
         cfg.Host(builder.Configuration.GetConnectionString("RabbitMQ"));
         // bence burda queue tanımlamaya gerek yok. Çünkü Payment'dan event publish edildi. Özellikle bi queue'ya atılmadı.7
+        cfg.ReceiveEndpoint( e => {
+
+            e.ConfigureConsumer<OrderRequestCompletedEventConsumer>(context);
+            e.ConfigureConsumer<OrderRequestFailedEventConsumer>(context);
+        });
     });
 
 });
