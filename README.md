@@ -1,4 +1,4 @@
-# Saga Patterns Implementation
+# Saga Pattern Examples
 
 This project is an implementation of different **Saga Pattern** approaches used to ensure data consistency in distributed systems.  
 It includes example implementations of two different approaches: **Orchestration-based Saga** and **Choreography-based Saga**.
