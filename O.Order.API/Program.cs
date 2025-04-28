@@ -22,7 +22,7 @@ builder.Services.AddMassTransit(x => {
     x.UsingRabbitMq((context, cfg) => {
 
         cfg.Host(builder.Configuration.GetConnectionString("RabbitMQ"));
-        // bence burda queue tanımlamaya gerek yok. Çünkü Payment'dan event publish edildi. Özellikle bi queue'ya atılmadı.7
+        // Burda queue tanımlamaya gerek yok. Çünkü Payment'dan event publish edildi. Özellikle bi queue'ya atılmadı.
         cfg.ReceiveEndpoint( e => {
 
             e.ConfigureConsumer<OrderRequestCompletedEventConsumer>(context);
