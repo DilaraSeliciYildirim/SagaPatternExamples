@@ -1,3 +1,0 @@
-﻿- Her API projesine MassTransit .net core kuruyoruz.
-
-- SagaStateMachine projesinin tipi "worker service". Bunun console app'ten farkı DI imkanıyla birlikte gelir.
