@@ -1,4 +1,4 @@
-# Saga Patterns Implementation
+# Saga Patterns Examples
 
 Bu proje, dağıtık sistemlerde veri tutarlılığını sağlamak amacıyla kullanılan **Saga Pattern** yaklaşımlarının bir uygulamasıdır.  
 İki farklı yaklaşımın örnek implementasyonlarını içerir: **Orchestration-based Saga** ve **Choreography-based Saga**.
