@@ -10,12 +10,14 @@ namespace SagaStateMachine
     {
         public Event<IOrderCreatedRequestEvent> OrderCreatedRequestEvent { get; set; } // SagaStateMachine'i tetikliyecek event.
         public Event<IStockReservedEvent> StockReservedEvent { get; set; } // StockAPI'den gelicek event, Saga dinleyecek..
+        public Event<IStockNotReservedEvent> StockNotReservedEvent { get; set; } // StockAPI'den gelicek event, Saga dinleyecek..
         public Event<IPaymentCompletedEvent> PaymentCompletedEvent { get; set; } // PaymentAPI'den gelicek event, Saga dinleyecek..
-        public Event<IStockNotReservedEvent> StockNotReservedEvent { get; set; } 
+        public Event<IPaymentFailedEvent> PaymentFailedEvent { get; set; } // PaymentAPI'den gelicek event, Saga dinleyecek..
         public State OrderCreated { get; private set; }
         public State StockReserved { get; private set; }
         public State StockNotReserved { get; private set; }
         public State PaymentCompleted { get; private set; }
+        public State PaymentFailed { get; private set; }
         public OrderStateMachine()
         {
             InstanceState(x => x.CurrentState);
@@ -74,14 +76,26 @@ namespace SagaStateMachine
                 When(StockNotReservedEvent)
                 .TransitionTo(StockNotReserved)
                 .Publish(context => new OrderRequestFailedEvent() 
-                { OrderId = context.Saga.OrderId, Reason = context.Message.Reason }));
+                { OrderId = context.Saga.OrderId, Reason = context.Message.Reason })
+                 .Then(context => { Console.WriteLine($"After StockNotReservedEvent: {context.Saga}"); }));
 
             During(StockReserved,
                 When(PaymentCompletedEvent)
                 .TransitionTo(PaymentCompleted)
                 .Publish(context => new OrderRequestCompletedEvent() { OrderId = context.Saga.OrderId })
                 .Then(context => { Console.WriteLine($"After PaymentCompletedEvent: {context.Saga}"); })
-                .Finalize()); // Bu adım önemli, artık işlem bitti state "final" olacak
+                .Finalize(), // Bu adım önemli, artık işlem bitti state "final" olacak
+
+                When(PaymentFailedEvent)
+                 .Publish(context => new OrderRequestFailedEvent()
+                 { OrderId = context.Saga.OrderId, Reason = context.Message.Reason })
+                 .Send(new Uri($"queue:{RabbitMQSettings.StockRollbackEventQueue}"), context => 
+                 new StockRollbackEvent() { OrderItems = context.Message.orderItems })
+                 .TransitionTo(PaymentFailed)
+                 .Then(context => { Console.WriteLine($"After PaymentFailedEvent: {context.Saga}"); })
+                );
+
+            SetCompletedWhenFinalized(); // final state'e ulaşmış instance'ları DB'den siler.
         }
     }
 }

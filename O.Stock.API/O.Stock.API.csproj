@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\O.Core\O.Core.csproj" />
-    <ProjectReference Include="..\O.Order.API\O.Order.API.csproj" />
   </ItemGroup>
 
 </Project>
